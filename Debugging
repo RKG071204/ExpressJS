@@ -1,28 +1,31 @@
 const express = require('express');
 const app = express();
 
-// Middleware to handle JSON parsing and urlencoded data
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middleware to log requests
+app.use((req, res, next) => {
+  console.log(`[${new Date().toLocaleString()}] ${req.method} ${req.url}`);
+  next();
+});
 
-// Example route that throws an error
-app.get('/error', (req, res, next) => {
-  try {
-    throw new Error('This is a deliberate error!');
-  } catch (error) {
-    next(error); // Pass the error to the error-handling middleware
-  }
+// Route for the home page
+app.get('/', (req, res) => {
+  res.send('Hello, World!');
+});
+
+// Route for the error page
+app.get('/error', (req, res) => {
+  // Simulating an error
+  throw new Error('Oops! Something went wrong.');
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack); // Log the error to the console
-  
-  // Set the status code and send the error message as the response
-  res.status(500).send('Something went wrong!');
+  console.error(err.stack);
+  res.status(500).send('Internal Server Error');
 });
 
 // Start the server
-app.listen(6000, () => {
-  console.log('Server is listening on port 6000');
+const port = 7000;
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });
