@@ -1,0 +1,70 @@
+// Import required modules
+const express = require('express');
+const bodyParser = require('body-parser');
+
+// Create Express application
+const app = express();
+
+// Configure body-parser middleware to handle JSON data
+app.use(bodyParser.json());
+
+// In-memory data store
+let todos = [];
+
+// RESTful API routes
+app.get('/api/todos', (req, res) => {
+  // Return all todos
+  res.json(todos);
+});
+
+app.get('/api/todos/:id', (req, res) => {
+  // Find todo by ID
+  const todo = todos.find(todo => todo.id === parseInt(req.params.id));
+
+  if (!todo) {
+    return res.status(404).json({ message: 'Todo not found' });
+  }
+
+  res.json(todo);
+});
+
+app.post('/api/todos', (req, res) => {
+  // Create a new todo
+  const todo = {
+    id: todos.length + 1,
+    title: req.body.title,
+    completed: false
+  };
+
+  todos.push(todo);
+  res.status(201).json(todo);
+});
+
+app.put('/api/todos/:id', (req, res) => {
+  // Update a todo
+  const todo = todos.find(todo => todo.id === parseInt(req.params.id));
+
+  if (!todo) {
+    return res.status(404).json({ message: 'Todo not found' });
+  }
+
+  todo.title = req.body.title;
+  res.json(todo);
+});
+
+app.delete('/api/todos/:id', (req, res) => {
+  // Delete a todo
+  const todoIndex = todos.findIndex(todo => todo.id === parseInt(req.params.id));
+
+  if (todoIndex === -1) {
+    return res.status(404).json({ message: 'Todo not found' });
+  }
+
+  todos.splice(todoIndex, 1);
+  res.sendStatus(204);
+});
+
+// Start the server
+app.listen(4000, () => {
+  console.log('Server started on port 4000');
+});
