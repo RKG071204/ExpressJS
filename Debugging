@@ -1,0 +1,28 @@
+const express = require('express');
+const app = express();
+
+// Middleware to handle JSON parsing and urlencoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Example route that throws an error
+app.get('/error', (req, res, next) => {
+  try {
+    throw new Error('This is a deliberate error!');
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log the error to the console
+  
+  // Set the status code and send the error message as the response
+  res.status(500).send('Something went wrong!');
+});
+
+// Start the server
+app.listen(6000, () => {
+  console.log('Server is listening on port 6000');
+});
